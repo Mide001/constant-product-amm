@@ -48,5 +48,30 @@ contract CPAMM {
             : (token1, token0, reserve1, reserve0);
 
         tokenIn.transferFrom(msg.sender, address(this), _amountIn);
+
+        /* 
+        xy = k
+        using first order ODE's
+        
+        (x+dx)(y-dy) = k
+        divide both sides  using (x+dx)
+        y - dy = k / (x+dx)
+        make dy the subject formula
+        -dy = -(y - k / (x+dx))
+        dy = (y - k) / (x+dx) 
+
+        remember k = xy 
+        dy = (y - dy) / (x + dx)
+        (yx + ydx - xy) / (x + dx) = dy
+        ydx / (x + dx) = dy
+        */
+
+        // 0.5% fee
+        uint amountInWithFee = (_amountIn * 995) / 1000;
+        amountOut = (reserveOut * amountInWithFee) / (reserveIn + amountInWithFee);
+
+        tokenOut.transfer(msg.sender, amountOut);
+
+        _update(token0.balanceOf(address(this)), token1.balanceOf(address(this)));
     }
 }
